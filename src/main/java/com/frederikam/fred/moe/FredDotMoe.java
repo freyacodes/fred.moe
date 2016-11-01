@@ -89,15 +89,21 @@ public class FredDotMoe {
             response.sendError(413);
             return "";
         }
+        
+        String filename = file.getOriginalFilename();
+        if(request.getParameter("name") != null){
+            filename = request.getParameter("name");
+        }
+        
 
         //No .exe files please
-        if (file.getOriginalFilename().toLowerCase().endsWith(".exe")) {
+        if (filename.toLowerCase().endsWith(".exe")) {
             response.sendError(400);
             return "";
         }
 
         String extension = "";
-        Matcher m = FILE_EXTENSION_PATTERN.matcher(request.getParameter("name"));
+        Matcher m = FILE_EXTENSION_PATTERN.matcher(filename);
         if (m.find()) {
             extension = m.group(1);
         }
@@ -115,7 +121,7 @@ public class FredDotMoe {
         JSONArray files = new JSONArray();
         JSONObject arrayInner = new JSONObject();
         arrayInner.put("hash", hash);
-        arrayInner.put("name", request.getParameter("name"));
+        arrayInner.put("name", filename);
         arrayInner.put("url", baseUrl + storeName);
         arrayInner.put("size", file.getSize());
 
