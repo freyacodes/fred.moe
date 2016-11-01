@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
 
 @Configuration
 @EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class, DataSourceAutoConfiguration.class})
@@ -40,7 +42,7 @@ public class FredDotMoe {
         Scanner scanner = new Scanner(is);
         JSONObject config = new JSONObject(scanner.useDelimiter("\\A").next());
         ResourceManager.dataDir = new File(config.getString("dataDir"));
-        
+
         scanner.close();
         ResourceManager.dataDir.mkdirs();
         ApplicationContext ctx = SpringApplication.run(FredDotMoe.class, args);
@@ -48,9 +50,24 @@ public class FredDotMoe {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    private static String get(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.sendError(404);
-        return "";
+    private static void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String path = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+        File f = ResourceManager.getResource(path.substring(1));
+        System.out.println(f.getParentFile().getAbsolutePath() + "\n" + ResourceManager.dataDir.getAbsolutePath());
+        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())) {
+            response.sendError(400);
+            return;
+        }
+
+        if (!f.exists()) {
+            response.sendError(404);
+            return;
+        }
+        
+        InputStream is = new FileInputStream(f);
+        IOUtils.copy(is, response.getOutputStream());
     }
 
     @PostMapping("/upload")
@@ -62,21 +79,23 @@ public class FredDotMoe {
         //Check if the file limit is reached
         if (file.getSize() > MAX_UPLOAD_SIZE) {
             response.sendError(413);
+            return "";
         }
-        
+
         //No .exe files please
-        if(file.getOriginalFilename().toLowerCase().endsWith(".exe")){
+        if (file.getOriginalFilename().toLowerCase().endsWith(".exe")) {
             response.sendError(400);
+            return "";
         }
-        
+
         String extension = "";
         Matcher m = FILE_EXTENSION_PATTERN.matcher(request.getParameter("name"));
-        if(m.find()){
+        if (m.find()) {
             extension = m.group(1);
         }
-        
+
         File f = ResourceManager.getResource(ResourceManager.getUniqueName(extension));
-        
+
         file.transferTo(f);
 
         return "";

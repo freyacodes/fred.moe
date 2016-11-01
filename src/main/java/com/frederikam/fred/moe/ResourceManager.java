@@ -27,6 +27,10 @@ public class ResourceManager {
     public static File getResource(String name) {
         return new File(dataDir, name);
     }
+    
+    private static String sanitizePath(String path){
+        return path.replaceAll("[\\.\\.]?\\?", "");
+    }
 
     private static char getRandomChar() {
         return BASE64_CHARS.charAt(RANDOM.nextInt(63));
