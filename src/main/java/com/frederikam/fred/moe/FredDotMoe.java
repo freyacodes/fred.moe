@@ -1,6 +1,5 @@
 package com.frederikam.fred.moe;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,7 +112,7 @@ public class FredDotMoe {
         File f = ResourceManager.getResource(storeName);
 
         MessageDigest md = MessageDigest.getInstance("md5");
-        String hash = Base64.encode(md.digest(file.getBytes()));
+        String hash = Base64.getEncoder().encodeToString(md.digest(file.getBytes()));
 
         //Now generate a response
         JSONObject root = new JSONObject();
