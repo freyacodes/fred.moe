@@ -48,7 +48,7 @@ public class ResourceManager {
             if("classes".equals(jarDir.getName()) && "target".equals(jarDir.getParentFile().getName())){
                 return new File(jarDir.getParentFile().getParentFile(), "public");
             } else {
-                return new File(jarDir, "public");
+                return new File(jarDir.getParentFile(), "public");
             }
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
