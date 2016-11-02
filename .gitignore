@@ -1,3 +1,4 @@
 /target/
 /data/
 /dependency-reduced-pom.xml
+*.moe.sublime-workspace

@@ -54,6 +54,8 @@ public class FredDotMoe {
         scanner.close();
         ResourceManager.dataDir.mkdirs();
         ApplicationContext ctx = SpringApplication.run(FredDotMoe.class, args);
+        
+        System.out.println(ResourceManager.PUBLIC_DIR);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -61,10 +63,15 @@ public class FredDotMoe {
     private static void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        
+        if(path.equals("/")){
+            path = "/index.html";
+        }
 
         File f = ResourceManager.getResource(path.substring(1));
-        System.out.println(f.getParentFile().getAbsolutePath() + "\n" + ResourceManager.dataDir.getAbsolutePath());
-        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())) {
+        //Verify that the file requested is in a public directory
+        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
+                && !f.getParentFile().getAbsolutePath().equals(ResourceManager.PUBLIC_DIR.getAbsolutePath())) {
             response.sendError(400);
             return;
         }

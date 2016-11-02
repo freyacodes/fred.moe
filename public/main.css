@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+body {
+	background-image: url(concrete_seamless.png);
+}
+
+.logo {
+	margin-top: 5vh;
+}
+
+.title {
+	font-family: 'Roboto', sans-serif;
+	margin-top: 5vh;
+	font-size: 64px;
+}
