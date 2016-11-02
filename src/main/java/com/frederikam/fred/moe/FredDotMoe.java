@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -39,6 +41,8 @@ import org.springframework.web.servlet.HandlerMapping;
 @ComponentScan
 public class FredDotMoe {
 
+    private static final Logger log = LoggerFactory.getLogger(FredDotMoe.class);
+    
     private static String baseUrl;
 
     public static final long MAX_UPLOAD_SIZE = 128 * 1000000;
@@ -63,15 +67,18 @@ public class FredDotMoe {
     private static void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-
+        
+        log.info("GET "+path);
+        
         if (path.equals("/")) {
             path = "/index.html";
         }
 
         File f = ResourceManager.getResource(path.substring(1));
+        boolean isInPublic = f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath());
         //Verify that the file requested is in a public directory
         if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
-                && !f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath())) {
+                && !isInPublic) {
             response.sendError(400);
             return;
         }
@@ -79,6 +86,14 @@ public class FredDotMoe {
         if (!f.exists()) {
             response.sendError(404);
             return;
+        }
+        
+        if(isInPublic && f.getName().endsWith(".css")){
+            response.setContentType("text/css");
+        }
+        
+        if(isInPublic && f.getName().endsWith(".appcache")){
+            response.setContentType("text/cache-manifest");
         }
 
         InputStream is = new FileInputStream(f);
@@ -91,6 +106,11 @@ public class FredDotMoe {
             HttpServletResponse response,
             @RequestParam("file") final MultipartFile file
     ) throws IOException, NoSuchAlgorithmException {
+        String path = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        
+        log.info("POST "+path);
+        
         //Check if the file limit is reached
         if (file.getSize() > MAX_UPLOAD_SIZE) {
             response.sendError(413);

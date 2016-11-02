@@ -3,3 +3,6 @@ img/concrete_seamless.png
 
 NETWORK:
 *
+
+FALLBACK:
+/404.html

@@ -30,7 +30,6 @@ public class ErrorHandler implements ErrorViewResolver {
                 if(!errorPage.exists()){
                     errorPage = ResourceManager.getResource("500.html");
                 }
-                System.out.println(errorPage.exists());
                 IOUtils.copy(new FileInputStream(errorPage), response.getOutputStream());
             }
         });
