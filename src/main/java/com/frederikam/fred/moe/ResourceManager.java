@@ -28,7 +28,6 @@ public class ResourceManager {
     public static File getResource(String name) {
         //Check the public dir first. This always takes priority
         File f = new File(PUBLIC_DIR, name);
-        System.out.println(f);
         if (f.exists()) {
             return f;
         }
