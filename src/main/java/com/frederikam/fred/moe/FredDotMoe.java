@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerMapping;
 
 @Configuration
@@ -57,9 +59,8 @@ public class FredDotMoe {
 
         scanner.close();
         ResourceManager.dataDir.mkdirs();
-        ApplicationContext ctx = SpringApplication.run(FredDotMoe.class, args);
 
-        System.out.println(ResourceManager.PUBLIC_DIR);
+        ApplicationContext ctx = SpringApplication.run(FredDotMoe.class, args);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -157,6 +158,14 @@ public class FredDotMoe {
         file.transferTo(f);//Finally move the file
 
         return root.toString();
+    }
+
+    /* Configuration */
+    @Bean(name = "multipartResolver")
+    public CommonsMultipartResolver commonsMultipartResolverBean() {
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        resolver.setMaxUploadSize(-1);
+        return resolver;
     }
 
 }
