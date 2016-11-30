@@ -28,11 +28,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerMapping;
@@ -105,8 +101,10 @@ public class FredDotMoe {
     @ResponseBody
     private static String upload(HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam("file") final MultipartFile file
+                                 @ModelAttribute("file") UploadedFile uploadedFile
     ) throws IOException, NoSuchAlgorithmException {
+        MultipartFile file = uploadedFile.getFile();
+
         String path = (String) request.getAttribute(
                 HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         
@@ -164,7 +162,7 @@ public class FredDotMoe {
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver commonsMultipartResolverBean() {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setMaxUploadSize(-1);
+        resolver.setMaxUploadSize(Long.MAX_VALUE);
         return resolver;
     }
 
