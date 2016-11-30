@@ -1,52 +1,36 @@
 package com.frederikam.fred.moe;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.io.*;
+import java.net.URLConnection;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.json.JSONArray;
+
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.NameDetector;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.HandlerMapping;
+import spark.Route;
+import spark.Spark;
+import spark.route.RouteOverview;
+import spark.utils.IOUtils;
 
-@Configuration
-@EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class, DataSourceAutoConfiguration.class})
-@Controller
-@ComponentScan
 public class FredDotMoe {
 
     private static final Logger log = LoggerFactory.getLogger(FredDotMoe.class);
+    private static TikaConfig tika;
     
     private static String baseUrl;
 
     public static final long MAX_UPLOAD_SIZE = 128 * 1000000;
     private static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile("(\\.\\w+)$");
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException, TikaException {
         InputStream is = new FileInputStream(new File("./config.json"));
         Scanner scanner = new Scanner(is);
         JSONObject config = new JSONObject(scanner.useDelimiter("\\A").next());
@@ -56,10 +40,64 @@ public class FredDotMoe {
         scanner.close();
         ResourceManager.dataDir.mkdirs();
 
-        ApplicationContext ctx = SpringApplication.run(FredDotMoe.class, args);
+        tika = new TikaConfig();
+
+        Spark.port(8080);
+        Spark.staticFileLocation("/public");
+        RouteOverview.enableRouteOverview();
+
+        /* handlers */
+        Route onGet = (request, response) -> {
+            String path = request.pathInfo();
+            log.info("GET " + path);
+
+            if (path.equals("/")) {
+                path = "/index.html";
+            }
+
+            File f = ResourceManager.getResource(path.substring(1));
+            boolean isInPublic = f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath());
+            //Verify that the file requested is in a public directory
+            if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
+                    && !isInPublic) {
+                Spark.halt(400);
+                return null;
+            }
+
+            if (!f.exists()) {
+                Spark.halt(404);
+                return null;
+            }
+
+            log.info(f.getAbsolutePath());
+
+            InputStream mimeIs = new BufferedInputStream(new FileInputStream(f));
+            String mimeType = URLConnection.guessContentTypeFromStream(mimeIs);
+            response.type(mimeType);
+
+            Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, f.toString());
+
+            MediaType mediaType = tika.getDetector().detect(
+                    TikaInputStream.get(f), metadata);
+
+
+            log.info("File " + f + " is " + mediaType.toString());
+            response.type(mediaType.toString());
+
+            InputStream fis = new FileInputStream(f);
+            IOUtils.copy(fis, response.raw().getOutputStream());
+            return "";
+        };
+
+        Spark.get("/*", onGet);
+        Spark.get("/", onGet);
+        Spark.get("/test", onGet);
+
+
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    /*@RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     private static void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = (String) request.getAttribute(
@@ -156,14 +194,6 @@ public class FredDotMoe {
         file.transferTo(f);//Finally move the file
 
         return root.toString();
-    }
-
-    /* Configuration */
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver commonsMultipartResolverBean() {
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setMaxUploadSize(Long.MAX_VALUE);
-        return resolver;
-    }
+    }*/
 
 }

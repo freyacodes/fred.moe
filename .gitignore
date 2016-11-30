@@ -4,3 +4,4 @@
 *.moe.sublime-workspace
 /.idea/
 *.iml
+/logs/
