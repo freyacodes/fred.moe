@@ -12,9 +12,9 @@ public class ResourceManager {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String getUniqueName(String extension) {
-        String name = "";
+        String name = "" + getRandomChar() + getRandomChar() + getRandomChar();
 
-        while (resourceExists(name + extension) || name.equals("")) {
+        while (resourceExists(name + extension)) {
             name = name + getRandomChar();
         }
 
