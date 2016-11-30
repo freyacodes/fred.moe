@@ -38,9 +38,16 @@
             <version>20160810</version>
         </dependency>
         <dependency>
+            <!-- Used by Spring Boot -->
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.2.2</version> <!-- Used by Spring Boot -->
+            <version>1.2.2</version>
+        </dependency>
+        <dependency>
+            <!-- Used by Spring Boot -->
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
         </dependency>
     </dependencies>
     <repositories>
