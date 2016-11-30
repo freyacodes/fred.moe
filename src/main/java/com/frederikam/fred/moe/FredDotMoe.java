@@ -60,12 +60,12 @@ public class FredDotMoe {
             //Verify that the file requested is in a public directory
             if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
                     && !isInPublic) {
-                Spark.halt(400);
+                Spark.halt(400, "Not found");
                 return null;
             }
 
             if (!f.exists()) {
-                Spark.halt(404);
+                Spark.halt(404, "Not found");
                 return null;
             }
 
@@ -91,8 +91,6 @@ public class FredDotMoe {
         };
 
         Spark.get("/*", onGet);
-        Spark.get("/", onGet);
-        Spark.get("/test", onGet);
 
 
     }
