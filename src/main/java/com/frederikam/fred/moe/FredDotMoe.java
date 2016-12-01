@@ -50,44 +50,7 @@ public class FredDotMoe {
 
     }
 
-    /*@RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    private static void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String path = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        
-        log.info("GET "+path);
-        
-        if (path.equals("/")) {
-            path = "/index.html";
-        }
-
-        File f = ResourceManager.getResource(path.substring(1));
-        boolean isInPublic = f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath());
-        //Verify that the file requested is in a public directory
-        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
-                && !isInPublic) {
-            response.sendError(400);
-            return;
-        }
-
-        if (!f.exists()) {
-            response.sendError(404);
-            return;
-        }
-        
-        if(isInPublic && f.getName().endsWith(".css")){
-            response.setContentType("text/css");
-        }
-        
-        if(isInPublic && f.getName().endsWith(".appcache")){
-            response.setContentType("text/cache-manifest");
-        }
-
-        InputStream is = new FileInputStream(f);
-        IOUtils.copy(is, response.getOutputStream());
-    }
-
+    /*
     @PostMapping(path = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     private static String upload(HttpServletRequest request,
