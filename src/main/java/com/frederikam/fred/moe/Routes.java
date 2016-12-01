@@ -7,6 +7,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.ExceptionHandler;
 import spark.Route;
 import spark.Spark;
 import spark.utils.IOUtils;
@@ -41,13 +42,11 @@ class Routes {
             //Verify that the file requested is in a public directory
             if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
                     && !isInPublic) {
-                Spark.halt(400, "Not found");
-                return null;
+                throw new FileNotFoundException();
             }
 
             if (!f.exists()) {
-                Spark.halt(404, "Not found");
-                return null;
+                throw new FileNotFoundException();
             }
 
             log.info(f.getAbsolutePath());
@@ -69,6 +68,31 @@ class Routes {
             InputStream fis = new FileInputStream(f);
             IOUtils.copy(fis, response.raw().getOutputStream());
             return "";
+        };
+    }
+
+    public static ExceptionHandler exceptonHandler() {
+        return (e, request, response) -> {
+            if(e instanceof FileNotFoundException){
+                response.status(404);
+
+                try {
+                    FileInputStream fis = new FileInputStream(new File("public/404.html"));
+                    response.body(IOUtils.toString(fis));
+                } catch (IOException e1) {
+                    log.error("", e1);
+                }
+            } else {
+                response.status(500);
+                log.error("500 internal server error", e);
+
+                try {
+                    FileInputStream fis = new FileInputStream(new File("public/500.html"));
+                    response.body(IOUtils.toString(fis));
+                } catch (IOException e1) {
+                    log.error("", e1);
+                }
+            }
         };
     }
 

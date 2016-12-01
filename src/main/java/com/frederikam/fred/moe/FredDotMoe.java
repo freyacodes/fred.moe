@@ -1,21 +1,12 @@
 package com.frederikam.fred.moe;
 
 import java.io.*;
-import java.net.URLConnection;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-
-import org.apache.tika.config.TikaConfig;
-import org.apache.tika.detect.NameDetector;
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.io.TikaInputStream;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.mime.MediaType;
-import org.apache.tika.mime.MimeType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Route;
 import spark.Spark;
 import spark.route.RouteOverview;
 import spark.utils.IOUtils;
@@ -41,13 +32,11 @@ public class FredDotMoe {
         ResourceManager.dataDir.mkdirs();
 
         Spark.port(8080);
-        Spark.staticFileLocation("/public");
         RouteOverview.enableRouteOverview();
 
         /* handlers */
         Spark.get("/*", Routes.onGet());
-
-
+        Spark.exception(Exception.class, Routes.exceptonHandler());
     }
 
     /*
