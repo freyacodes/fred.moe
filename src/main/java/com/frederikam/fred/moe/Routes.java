@@ -141,7 +141,7 @@ public class Routes {
             files.put(arrayInner);
             root.put("files", files);
 
-            log.info("File " + f + "was uploaded");
+            log.info("File " + f + " was uploaded");
 
             return root.toString();
         };
