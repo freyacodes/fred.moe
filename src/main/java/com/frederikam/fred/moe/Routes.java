@@ -17,6 +17,8 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.regex.Matcher;
@@ -68,8 +70,6 @@ public class Routes {
             MediaType mediaType = tika.getDetector().detect(
                     TikaInputStream.get(f), metadata);
 
-
-            //log.info("File " + f + " is " + mediaType.toString());
             response.type(mediaType.toString());
 
             InputStream fis = new FileInputStream(f);
@@ -80,7 +80,7 @@ public class Routes {
 
     public static Route upload(){
         return (request, response) -> {
-            request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement(System.getProperty("java.io.tmpdir")));
+            request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             Part part = request.raw().getPart("file");
 
             String path = request.pathInfo();
@@ -112,22 +112,20 @@ public class Routes {
             String storeName = ResourceManager.getUniqueName(extension);
             File f = ResourceManager.getResource(storeName);
 
-            try (FileWriter fw = new FileWriter(f)) {
+            /*try (FileWriter fw = new FileWriter(f)) {
                 IOUtils.copy(part.getInputStream(), fw);
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            }*/
+
+            try (InputStream input = part.getInputStream()) { // getPart needs to use same "name" as input field in form
+                Files.copy(input, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
             byte[] bytes = IOUtils.toByteArray(new FileInputStream(f));
-            log.info("got bytes");
             MessageDigest md = MessageDigest.getInstance("md5");
-            log.info("digest");
 
             String hash = Base64.getEncoder().encodeToString(md.digest(bytes));
-
-
-            log.info(f.getAbsolutePath());
-            log.info(hash);
 
             //Now generate a response
             JSONObject root = new JSONObject();
@@ -144,8 +142,6 @@ public class Routes {
             root.put("files", files);
 
             log.info("File " + f + "was uploaded");
-
-            log.info(root.toString());
 
             return root.toString();
         };
