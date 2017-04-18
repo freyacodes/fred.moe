@@ -18,7 +18,9 @@ import javax.servlet.http.Part;
 import java.io.*;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.regex.Matcher;
@@ -122,10 +124,14 @@ public class Routes {
                 Files.copy(input, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            byte[] bytes = IOUtils.toByteArray(new FileInputStream(f));
-            MessageDigest md = MessageDigest.getInstance("md5");
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            try (InputStream is = Files.newInputStream(Paths.get("file.txt"));
+                 DigestInputStream dis = new DigestInputStream(is, md))
+            {
+                /* Read decorated stream (dis) to EOF as normal... */
+            }
 
-            String hash = Base64.getEncoder().encodeToString(md.digest(bytes));
+            String hash = Base64.getEncoder().encodeToString(md.digest());
 
             //Now generate a response
             JSONObject root = new JSONObject();
