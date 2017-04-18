@@ -1,5 +1,6 @@
 package com.frederikam.fred.moe;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
@@ -18,10 +19,7 @@ import javax.servlet.http.Part;
 import java.io.*;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +39,7 @@ public class Routes {
         }
     }
 
-    public static Route onGet(){
+    static Route onGet(){
         return (request, response) -> {
             String path = request.pathInfo();
             log.info("GET " + path);
@@ -80,7 +78,7 @@ public class Routes {
         };
     }
 
-    public static Route upload(){
+    static Route upload(){
         return (request, response) -> {
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             Part part = request.raw().getPart("file");
@@ -114,24 +112,13 @@ public class Routes {
             String storeName = ResourceManager.getUniqueName(extension);
             File f = ResourceManager.getResource(storeName);
 
-            /*try (FileWriter fw = new FileWriter(f)) {
-                IOUtils.copy(part.getInputStream(), fw);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }*/
-
             try (InputStream input = part.getInputStream()) { // getPart needs to use same "name" as input field in form
                 Files.copy(input, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (InputStream is = Files.newInputStream(Paths.get("file.txt"));
-                 DigestInputStream dis = new DigestInputStream(is, md))
-            {
-                /* Read decorated stream (dis) to EOF as normal... */
-            }
+            String hash = Base64.getEncoder().encodeToString(DigestUtils.md5(new FileInputStream(f)));
 
-            String hash = Base64.getEncoder().encodeToString(md.digest());
+            log.info("Hash: " + hash);
 
             //Now generate a response
             JSONObject root = new JSONObject();
@@ -149,11 +136,13 @@ public class Routes {
 
             log.info("File " + f + " was uploaded");
 
+            response.type("application/json");
+
             return root.toString();
         };
     }
 
-    public static ExceptionHandler exceptionHandler() {
+    static ExceptionHandler exceptionHandler() {
         return (e, request, response) -> {
             if(e instanceof FileNotFoundException){
                 response.status(404);
