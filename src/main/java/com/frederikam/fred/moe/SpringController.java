@@ -1,13 +1,7 @@
 package com.frederikam.fred.moe;
 
-import com.frederikam.fred.moe.exception.BadRequestException;
-import com.frederikam.fred.moe.exception.FileTooBigException;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.IOUtils;
@@ -19,21 +13,16 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.multipart.support.MultipartFilter;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,9 +80,14 @@ public class SpringController {
 
     @PostMapping("/upload")
     @ResponseBody
-    public String upload(HttpServletRequest request, HttpServletResponse response, @RequestHeader(required = false) String name) throws IOException, FileUploadException {
+    public String upload(HttpServletRequest request,
+                         HttpServletResponse response,
+                         @RequestHeader(required = false) String name,
+                         @RequestParam("file") MultipartFile file
+    ) throws IOException, FileUploadException {
         log.info("POST "+request.getServletPath());
 
+        /*
         ServletFileUpload upload = new ServletFileUpload();
 
         FileItemIterator fii = upload.getItemIterator(request);
@@ -116,15 +110,9 @@ public class SpringController {
 
         try (InputStream input = item.openStream()) { // getPart needs to use same "name" as input field in form
             Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        }
+        }*/
 
-        //Check if the file limit is reached
-        if (file.length() > FredDotMoe.MAX_UPLOAD_SIZE) {
-            log.error("Uploaded size was " + file.length() + ", max size is " + FredDotMoe.MAX_UPLOAD_SIZE);
-            throw new FileTooBigException();
-        }
-
-        String filename = item.getName();
+        String filename = file.getOriginalFilename();
         if (name != null) {
             filename = name;
         }
@@ -144,7 +132,7 @@ public class SpringController {
         File f = ResourceManager.getResource(storeName);
 
         //noinspection ResultOfMethodCallIgnored
-        file.renameTo(f);
+        file.transferTo(f);
 
         String hash = Base64.getEncoder().encodeToString(DigestUtils.md5(new FileInputStream(f)));
 
@@ -169,21 +157,6 @@ public class SpringController {
         response.setContentType("application/json");
 
         return root.toString();
-    }
-
-    @Bean
-    public CommonsMultipartResolver commonsMultipartResolver() {
-        final CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-        commonsMultipartResolver.setMaxUploadSize(-1);
-        return commonsMultipartResolver;
-    }
-
-    @Bean
-    public FilterRegistrationBean multipartFilterRegistrationBean() {
-        final MultipartFilter multipartFilter = new MultipartFilter();
-        final FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(multipartFilter);
-        filterRegistrationBean.addInitParameter("multipartResolverBeanName", "commonsMultipartResolver");
-        return filterRegistrationBean;
     }
 
 }

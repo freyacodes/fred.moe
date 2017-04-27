@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 
 public class ResourceManager {
 
+
     public static File dataDir = new File("./data");
     public static final File PUBLIC_DIR = getPublicDir();
     private static final String BASE64_CHARS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
