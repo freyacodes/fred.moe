@@ -19,13 +19,6 @@ public class FredDotMoe {
     private static String dataDirLocation;
 
     public static void main(String[] args) throws IOException, TikaException {
-        /*InputStream is = new FileInputStream(new File("./config.json"));
-        Scanner scanner = new Scanner(is);
-        JSONObject config = new JSONObject(scanner.useDelimiter("\\A").next());
-        ResourceManager.dataDir = new File(config.getString("dataDir"));
-        baseUrl = config.optString("baseUrl", "http://localhost/");
-        scanner.close();*/
-
         //Tomcat changes the working dir, so we make this absolute
         ResourceManager.dataDir = new File(dataDirLocation).getAbsoluteFile();
 

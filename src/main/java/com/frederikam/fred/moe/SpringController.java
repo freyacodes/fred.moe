@@ -87,31 +87,6 @@ public class SpringController {
     ) throws IOException, FileUploadException {
         log.info("POST "+request.getServletPath());
 
-        /*
-        ServletFileUpload upload = new ServletFileUpload();
-
-        FileItemIterator fii = upload.getItemIterator(request);
-        FileItemStream item = null; //Should be the one called "file"
-
-        while(fii.hasNext()) {
-            FileItemStream fis = fii.next();
-            log.info("Received " + fis.getFieldName());
-            if (fis.getFieldName().equals("file")) {
-                item = fis;
-                break;
-            }
-        }
-
-        if(item == null) {
-            throw new BadRequestException("Missing form part 'file'");
-        }
-
-        File file = File.createTempFile(RandomStringUtils.random(8), "");
-
-        try (InputStream input = item.openStream()) { // getPart needs to use same "name" as input field in form
-            Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        }*/
-
         String filename = file.getOriginalFilename();
         if (name != null) {
             filename = name;
