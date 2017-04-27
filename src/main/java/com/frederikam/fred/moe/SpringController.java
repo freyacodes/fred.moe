@@ -1,0 +1,189 @@
+package com.frederikam.fred.moe;
+
+import com.frederikam.fred.moe.exception.BadRequestException;
+import com.frederikam.fred.moe.exception.FileTooBigException;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.IOUtils;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.MultipartFilter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Controller
+@EnableAutoConfiguration
+public class SpringController {
+
+    private static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile("(\\.\\w+)$");
+
+    private static final Logger log = LoggerFactory.getLogger(SpringController.class);
+    private static TikaConfig tika = createTikaConfig();
+
+    private static TikaConfig createTikaConfig() {
+        try {
+            return new TikaConfig();
+        } catch (TikaException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/*")
+    @ResponseBody
+    public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String path = request.getServletPath();
+        log.info("GET " + path);
+
+        if (path.equals("/")) {
+            path = "/index.html";
+        }
+
+        File f = ResourceManager.getResource(path.substring(1));
+        boolean isInPublic = f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath());
+        //Verify that the file requested is in a public directory
+        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
+                && !isInPublic) {
+            throw new FileNotFoundException();
+        }
+
+        if (!f.exists()) {
+            throw new FileNotFoundException();
+        }
+
+        Metadata metadata = new Metadata();
+        metadata.set(Metadata.RESOURCE_NAME_KEY, f.toString());
+
+        MediaType mediaType = tika.getDetector().detect(
+                TikaInputStream.get(f.toPath()), metadata);
+
+        response.setContentType(mediaType.toString());
+
+        IOUtils.copy(new FileInputStream(f), response.getOutputStream());
+        response.flushBuffer();
+    }
+
+    @PostMapping("/upload")
+    @ResponseBody
+    public String upload(HttpServletRequest request, HttpServletResponse response, @RequestHeader(required = false) String name) throws IOException, FileUploadException {
+        log.info("POST "+request.getServletPath());
+
+        ServletFileUpload upload = new ServletFileUpload();
+
+        FileItemIterator fii = upload.getItemIterator(request);
+        FileItemStream item = null; //Should be the one called "file"
+
+        while(fii.hasNext()) {
+            FileItemStream fis = fii.next();
+            log.info("Received " + fis.getFieldName());
+            if (fis.getFieldName().equals("file")) {
+                item = fis;
+                break;
+            }
+        }
+
+        if(item == null) {
+            throw new BadRequestException("Missing form part 'file'");
+        }
+
+        File file = File.createTempFile(RandomStringUtils.random(8), "");
+
+        try (InputStream input = item.openStream()) { // getPart needs to use same "name" as input field in form
+            Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        //Check if the file limit is reached
+        if (file.length() > FredDotMoe.MAX_UPLOAD_SIZE) {
+            log.error("Uploaded size was " + file.length() + ", max size is " + FredDotMoe.MAX_UPLOAD_SIZE);
+            throw new FileTooBigException();
+        }
+
+        String filename = item.getName();
+        if (name != null) {
+            filename = name;
+        }
+
+        //No .exe files please
+        if (filename.toLowerCase().endsWith(".exe")) {
+            throw new RuntimeException(".exe files are not allowed");
+        }
+
+        String extension = "";
+        Matcher m = FILE_EXTENSION_PATTERN.matcher(filename);
+        if (m.find()) {
+            extension = m.group(1);
+        }
+
+        String storeName = ResourceManager.getUniqueName(extension);
+        File f = ResourceManager.getResource(storeName);
+
+        //noinspection ResultOfMethodCallIgnored
+        file.renameTo(f);
+
+        String hash = Base64.getEncoder().encodeToString(DigestUtils.md5(new FileInputStream(f)));
+
+        log.info("Hash: " + hash);
+
+        //Now generate a response
+        JSONObject root = new JSONObject();
+        root.put("success", true);
+
+        JSONArray files = new JSONArray();
+        JSONObject arrayInner = new JSONObject();
+        arrayInner.put("hash", hash);
+        arrayInner.put("name", filename);
+        arrayInner.put("url", FredDotMoe.baseUrl + storeName);
+        arrayInner.put("size", f.length());
+
+        files.put(arrayInner);
+        root.put("files", files);
+
+        log.info("File " + f + " was uploaded");
+
+        response.setContentType("application/json");
+
+        return root.toString();
+    }
+
+    @Bean
+    public CommonsMultipartResolver commonsMultipartResolver() {
+        final CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+        commonsMultipartResolver.setMaxUploadSize(-1);
+        return commonsMultipartResolver;
+    }
+
+    @Bean
+    public FilterRegistrationBean multipartFilterRegistrationBean() {
+        final MultipartFilter multipartFilter = new MultipartFilter();
+        final FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(multipartFilter);
+        filterRegistrationBean.addInitParameter("multipartResolverBeanName", "commonsMultipartResolver");
+        return filterRegistrationBean;
+    }
+
+}
