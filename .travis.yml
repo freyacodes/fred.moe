@@ -1,0 +1,18 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
+
+jdk:
+  - oraclejdk8
+
+script:
+  - docker build .
+
