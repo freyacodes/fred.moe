@@ -43,7 +43,11 @@ public class VirusScanner extends Thread {
         }
     }
 
-    static void handleFile(File file) throws IOException, InterruptedException {
+    public void scanAsync(File file) {
+        queue.add(file);
+    }
+
+    private static void handleFile(File file) throws IOException, InterruptedException {
         if(!isFileBad(file))
             return;
 
@@ -55,7 +59,7 @@ public class VirusScanner extends Thread {
         pw.close();
     }
 
-    static boolean isFileBad(File file) throws IOException, InterruptedException {
+    private static boolean isFileBad(File file) throws IOException, InterruptedException {
         Process proc = Runtime.getRuntime().exec("clamscan " + file.getAbsolutePath());
         new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
 

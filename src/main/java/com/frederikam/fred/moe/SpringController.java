@@ -131,6 +131,8 @@ public class SpringController {
 
         response.setContentType("application/json");
 
+        FredDotMoe.getVirusScanner().scanAsync(f);
+
         return root.toString();
     }
 

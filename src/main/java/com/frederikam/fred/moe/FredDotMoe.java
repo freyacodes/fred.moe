@@ -33,9 +33,15 @@ public class FredDotMoe {
         new Caddy().start();
 
         if(VirusScanner.isAvInstalled()) {
+            log.info("Virus scanning available");
             virusScanner = new VirusScanner();
             virusScanner.start();
+        } else {
+            log.warn("Virus scanning unavailable. Skipping...");
         }
     }
 
+    public static VirusScanner getVirusScanner() {
+        return virusScanner;
+    }
 }
