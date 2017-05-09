@@ -57,7 +57,7 @@ public class SpringController {
         File f = ResourceManager.getResource(path.substring(1));
         boolean isInPublic = f.getAbsolutePath().startsWith(ResourceManager.PUBLIC_DIR.getAbsolutePath());
         //Verify that the file requested is in a public directory
-        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.dataDir.getAbsolutePath())
+        if (!f.getParentFile().getAbsolutePath().equals(ResourceManager.getDataDir().getAbsolutePath())
                 && !isInPublic) {
             throw new FileNotFoundException();
         }

@@ -1,7 +1,11 @@
 :80 {
-    proxy / localhost:2500
+    proxy / localhost:2500 {
+        transparent
+    }
 }
 
 :443 {
-    proxy / localhost:2500
+    proxy / localhost:2500 {
+        transparent
+    }
 }
