@@ -44,7 +44,7 @@ public class SpringController {
         }
     }
 
-    @GetMapping("/*")
+    @GetMapping("/**")
     @ResponseBody
     public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String path = request.getServletPath();

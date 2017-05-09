@@ -1,0 +1,7 @@
+:80 {
+    proxy / localhost:2500
+}
+
+:443 {
+    proxy / localhost:2500
+}

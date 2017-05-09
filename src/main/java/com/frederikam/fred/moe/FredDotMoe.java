@@ -13,19 +13,21 @@ public class FredDotMoe {
 
     private static final Logger log = LoggerFactory.getLogger(FredDotMoe.class);
 
-    @Value("{fredDotMoe.baseUrl}")
+    @Value("{moe.baseUrl}")
     static String baseUrl;
-    @Value("{fredDotMoe.dataDir}")
-    private static String dataDirLocation;
+    @Value("{moe.dataDir}")
+    private static String dataDir = "data";
 
     public static void main(String[] args) throws IOException, TikaException {
         //Tomcat changes the working dir, so we make this absolute
-        ResourceManager.dataDir = new File(dataDirLocation).getAbsoluteFile();
+        ResourceManager.dataDir = new File(dataDir).getAbsoluteFile();
 
         //noinspection ResultOfMethodCallIgnored
         ResourceManager.dataDir.mkdirs();
 
         SpringApplication.run(SpringController.class, args);
+
+        new Caddy().start();
     }
 
 }
