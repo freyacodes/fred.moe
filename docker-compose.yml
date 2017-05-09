@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  dev:
+    image: foo
+    hostname: moedev
+    container_name: moedev
+    ports:
+    - "80:80"
+    - "443:443"
+    - "8080:8080"
+    environment:
+    # This is required for automatic HTTPS! Setting this value
+    # indicates that you agree to Let's Encrypt Subscriber Agreement.
+    # No further action is required on your part
+    - CADDY_EMAIL=""
