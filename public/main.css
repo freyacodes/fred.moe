@@ -1,16 +1,45 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
-body {
-	background-image: url(img/concrete_seamless.png);
-	background-color: #F5F5F5;
+* {
+    z-index: 1;
 }
 
-.logo {
-	margin-top: 5vh;
+.app {
+    background-image: url("/img/bg.jpg");
+    width: 100vw;
+    height: 100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-.title {
-	font-family: 'Roboto', sans-serif;
-	margin-top: 5vh;
-	font-size: 64px;
+.bg-modal {
+    position: fixed;
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.footer {
+    background-color: black;
+    height: 64px;
+    width: 100%;
+    position: fixed;
+    top: calc(100vh - 64px);
+    left: 0;
+}
+
+.dropbar {
+    border: medium solid white;
+    color: white;
+    font-size: 32px;
+    font-family: Roboto, sans-serif;
+    width: 16ch;
+    padding: 8px;
+    text-align: center;
+    user-select: none;
+    cursor: default;
 }
