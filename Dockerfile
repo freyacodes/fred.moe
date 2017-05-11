@@ -15,4 +15,4 @@ RUN apt update && \
     apt clean && \
     curl https://getcaddy.com | bash
 
-CMD sh ./home/run.sh
+CMD cd /home && sh ./run.sh
