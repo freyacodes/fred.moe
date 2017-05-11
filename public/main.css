@@ -29,15 +29,6 @@ a {
     z-index: 0;
 }
 
-.footer {
-    background-color: black;
-    height: 64px;
-    width: 100%;
-    position: fixed;
-    top: calc(100vh - 64px);
-    left: 0;
-}
-
 .filedrop {
     width: 100%;
     height: 50vh;
@@ -73,4 +64,25 @@ a {
     position: relative;
     left: 0;
     top: 0;
+}
+
+.footer {
+    background-color: #24292E;
+    height: 48px;
+    width: 100%;
+    position: fixed;
+    top: calc(100vh - 48px);
+    left: 0;
+}
+
+.footer > a, .footer {
+    color: white;
+    font-family: Roboto, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    line-height: 48px;
+}
+
+.version {
+    display: inline;
 }

@@ -83,5 +83,10 @@ function onload() {
     var dropZone = document.getElementById('dropzone');
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
+
+    var loc = window.location.origin.replace(/https?:\/\//, "");
+    loc = loc.replace(/:\d+/, "");
+
+    document.getElementById('footer').innerHTML = loc + ' ~ v2.0 ~ <a href="https://github.com/Frederikam/fred.moe">about</a>';
 }
 
