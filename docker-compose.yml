@@ -2,7 +2,7 @@ version: '2'
 
 services:
   moe:
-    image: v2
+    image: frederikam/fred.moe:latest
     hostname: moe
     container_name: moe
     ports:
@@ -13,4 +13,23 @@ services:
     # This is required for automatic HTTPS! Setting this value
     # indicates that you agree to Let's Encrypt Subscriber Agreement.
     # No further action is required on your part
-    - CADDY_EMAIL=""
+    - CADDY_EMAIL=
+    volumes:
+    # Be default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
+    - ./moedata:/home/data
+  dev:
+      image: frederikam/fred.moe:v2
+      hostname: moe
+      container_name: moe
+      ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+      environment:
+      # This is required for automatic HTTPS! Setting this value
+      # indicates that you agree to Let's Encrypt Subscriber Agreement.
+      # No further action is required on your part
+      - CADDY_EMAIL=""
+      volumes:
+      # Be default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
+      - ./moedata:/home/data
