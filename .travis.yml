@@ -14,7 +14,12 @@ jdk:
   - oraclejdk8
 
 script:
-  - TAG_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/\//_/g')
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+        TAG_NAME=latest
+    else
+        TAG_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/\//_/g')
+    fi
+
   - docker build . --tag "frederikam/fred.moe:${TAG_NAME}"
 
 
