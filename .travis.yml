@@ -1,0 +1,29 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
+
+jdk:
+  - oraclejdk8
+
+script:
+  - |
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
+      TAG_NAME=latest
+    else
+      TAG_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/\//_/g')
+    fi
+
+  - docker build . --tag "frederikam/fred.moe:${TAG_NAME}"
+
+
+after_success:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  - docker push frederikam/fred.moe;

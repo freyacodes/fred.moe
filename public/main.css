@@ -1,16 +1,88 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
-body {
-	background-image: url(img/concrete_seamless.png);
-	background-color: #F5F5F5;
+* {
+    z-index: 2;
 }
 
-.logo {
-	margin-top: 5vh;
+a {
+    color: white;
+    font-size: 24px;
+    font-family: Roboto, sans-serif;
 }
 
-.title {
-	font-family: 'Roboto', sans-serif;
-	margin-top: 5vh;
-	font-size: 64px;
+.app {
+    background-image: url("/img/bg.jpg");
+    width: 100vw;
+    height: 100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.bg-modal {
+    position: fixed;
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.filedrop {
+    width: 100%;
+    height: 50vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.dropbar, .file-progress {
+    border: medium solid white;
+    color: white;
+    font-size: 24px;
+    font-family: Roboto, sans-serif;
+    width: 20ch;
+    padding: 8px;
+    margin: 8px;
+    text-align: center;
+}
+
+.dropbar {
+    user-select: none;
+    cursor: default;
+}
+
+.progress-bar {
+    background-color: #3AAF59;
+    width: 0;
+    height: 100%;
+    z-index: 1;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+.footer {
+    background-color: #24292E;
+    height: 48px;
+    width: 100%;
+    position: fixed;
+    top: calc(100vh - 48px);
+    left: 0;
+}
+
+.footer > a, .footer {
+    color: white;
+    font-family: Roboto, sans-serif;
+    font-size: 24px;
+    text-align: center;
+    line-height: 48px;
+}
+
+.version {
+    display: inline;
 }

@@ -1,41 +1,47 @@
 package com.frederikam.fred.moe;
 
-import java.io.*;
-import java.util.Scanner;
-
+import com.frederikam.fred.moe.util.VirusScanner;
 import org.apache.tika.exception.TikaException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Spark;
-import spark.route.RouteOverview;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+
+import java.io.File;
+import java.io.IOException;
 
 public class FredDotMoe {
 
     private static final Logger log = LoggerFactory.getLogger(FredDotMoe.class);
 
-    
-    protected static String baseUrl;
+    @Value("{moe.baseUrl}")
+    static String baseUrl;
+    @Value("{moe.dataDir}")
+    private static String dataDir = "data";
 
-    public static final long MAX_UPLOAD_SIZE = 128 * 1000000;
+    private static VirusScanner virusScanner = null;
 
     public static void main(String[] args) throws IOException, TikaException {
-        InputStream is = new FileInputStream(new File("./config.json"));
-        Scanner scanner = new Scanner(is);
-        JSONObject config = new JSONObject(scanner.useDelimiter("\\A").next());
-        ResourceManager.dataDir = new File(config.getString("dataDir"));
-        baseUrl = config.optString("baseUrl", "http://localhost/");
+        //Tomcat changes the working dir, so we make this absolute
+        ResourceManager.setDataDir(new File(dataDir).getAbsoluteFile());
 
-        scanner.close();
-        ResourceManager.dataDir.mkdirs();
+        //noinspection ResultOfMethodCallIgnored
+        ResourceManager.getDataDir().mkdirs();
 
-        Spark.port(8080);
-        RouteOverview.enableRouteOverview();
+        SpringApplication.run(SpringController.class, args);
 
-        /* handlers */
-        Spark.get("/*", Routes.onGet());
-        Spark.post("/upload", Routes.upload());
-        Spark.exception(Exception.class, Routes.exceptionHandler());
+        new Caddy().start();
+
+        if(VirusScanner.isAvInstalled()) {
+            log.info("Virus scanning available");
+            virusScanner = new VirusScanner();
+            virusScanner.start();
+        } else {
+            log.warn("Virus scanning unavailable. Skipping...");
+        }
     }
 
+    public static VirusScanner getVirusScanner() {
+        return virusScanner;
+    }
 }

@@ -1,0 +1,11 @@
+.idea
+data
+logs
+src
+target/classes
+target/generated-sources
+target/maven-archiver
+target/surefire
+target/test-classes
+target/fred.moe-1.0-shaded.jar
+target/original-fred.moe.jars
