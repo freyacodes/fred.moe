@@ -13,9 +13,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -121,7 +123,7 @@ public class SpringController {
         JSONObject arrayInner = new JSONObject();
         arrayInner.put("hash", hash);
         arrayInner.put("name", filename);
-        arrayInner.put("url", FredDotMoe.baseUrl + storeName);
+        arrayInner.put("url", request.getScheme() + "://" + request.getServerName() + "/" + storeName);
         arrayInner.put("size", f.length());
 
         files.put(arrayInner);
@@ -131,9 +133,24 @@ public class SpringController {
 
         response.setContentType("application/json");
 
-        FredDotMoe.getVirusScanner().scanAsync(f);
+        if(FredDotMoe.getVirusScanner() != null)
+            FredDotMoe.getVirusScanner().scanAsync(f);
 
         return root.toString();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleError(HttpServletRequest req, Exception ex) {
+        log.error("Request raised an error: " + req.getRequestURL(), ex);
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("exception", ex);
+        mav.addObject("url", req.getRequestURL());
+        mav.setViewName("error");
+
+        mav.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return mav;
     }
 
 }

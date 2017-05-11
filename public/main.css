@@ -1,7 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
 * {
-    z-index: 1;
+    z-index: 2;
+}
+
+a {
+    color: white;
+    font-size: 24px;
+    font-family: Roboto, sans-serif;
 }
 
 .app {
@@ -32,14 +38,39 @@
     left: 0;
 }
 
-.dropbar {
+.filedrop {
+    width: 100%;
+    height: 50vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.dropbar, .file-progress {
     border: medium solid white;
     color: white;
-    font-size: 32px;
+    font-size: 24px;
     font-family: Roboto, sans-serif;
-    width: 16ch;
+    width: 20ch;
     padding: 8px;
+    margin: 16px;
     text-align: center;
+}
+
+.dropbar {
     user-select: none;
     cursor: default;
+}
+
+.progress-bar {
+    background-color: #3AAF59;
+    width: 0;
+    height: 100%;
+    z-index: 1;
+    position: relative;
+    left: 0;
+    top: 0;
 }
