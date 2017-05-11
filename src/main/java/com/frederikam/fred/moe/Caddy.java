@@ -1,6 +1,5 @@
 package com.frederikam.fred.moe;
 
-import com.frederikam.fred.moe.util.SLF4JInputStreamLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +20,9 @@ public class Caddy extends Thread {
 
             ProcessBuilder pb = new ProcessBuilder()
                     .command("caddy", "-conf", "Caddyfile", "-agree", "-email", "$CADDY_EMAIL");
+            pb.inheritIO();
             Process proc = pb.start();
-            new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
+            //new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
 
             try {
                 int code = proc.waitFor();
