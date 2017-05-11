@@ -20,7 +20,7 @@ public class Caddy extends Thread {
             log.info("Starting Caddy");
 
             Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec("caddy -conf Caddyfile -agree -email " + System.getenv("CADDY_EMAIL"));
+            Process proc = rt.exec("caddy -conf Caddyfile -agree -email $CADDY_EMAIL");
             new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
 
             try {
