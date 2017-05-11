@@ -14,5 +14,10 @@ jdk:
   - oraclejdk8
 
 script:
-  - docker build .
+  - TAG_NAME=$(echo ${TRAVIS_BRANCH} | sed -e 's/\//_/g')
+  - docker build . --tag "fredboat/fred.moe:${TAG_NAME}"
 
+
+after_success:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  - docker push fredboat/fred.moe;
