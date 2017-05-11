@@ -18,7 +18,7 @@ public class VirusScanner extends Thread {
     private static final int CODE_CLEAN = 0;
     private static final int CODE_BAD = 1;
 
-    private static final int CRON_INTERVAL = 60 * 1000;
+    private static final int CRON_INTERVAL = 24 * 60 * 60 * 1000;
     private final LinkedBlockingQueue<File> queue = new LinkedBlockingQueue<>();
 
     public VirusScanner() {
