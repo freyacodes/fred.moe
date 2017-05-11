@@ -2,9 +2,9 @@ version: '2'
 
 services:
   dev:
-    image: foo
-    hostname: moedev
-    container_name: moedev
+    image: v2
+    hostname: moe
+    container_name: moe
     ports:
     - "80:80"
     - "443:443"
