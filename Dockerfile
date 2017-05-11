@@ -10,7 +10,7 @@ COPY README.md /home/README.md
 COPY run.sh /home/run.sh
 
 RUN apt update && \
-    apt install clamav && \
+    apt install clamav -y && \
     apt install curl -y && \
     apt clean && \
     curl https://getcaddy.com | bash
