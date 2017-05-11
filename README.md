@@ -19,7 +19,7 @@ Otherwise take a look at [how to install Docker](https://www.docker.com/communit
 ### Step 2: Install Docker Compose
 Please take a look at [the docker docs](https://docs.docker.com/compose/install/).
 
-### Step 3: Comfigure the service
+### Step 3: Configure the service
 Create a new **permanent** directory for fred.moe. Create a file called `docker-compose.yml` and paste this into it:
 ```yaml
 version: '2'
