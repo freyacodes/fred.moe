@@ -19,8 +19,9 @@ public class Caddy extends Thread {
         try {
             log.info("Starting Caddy");
 
-            Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec("caddy -conf Caddyfile -agree -email $CADDY_EMAIL");
+            ProcessBuilder pb = new ProcessBuilder()
+                    .command("caddy", "-conf Caddyfile", "-agree", "-email $CADDY_EMAIL");
+            Process proc = pb.start();doc
             new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
 
             try {
