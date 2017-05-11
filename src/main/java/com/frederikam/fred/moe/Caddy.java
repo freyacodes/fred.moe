@@ -20,7 +20,7 @@ public class Caddy extends Thread {
             log.info("Starting Caddy");
 
             ProcessBuilder pb = new ProcessBuilder()
-                    .command("caddy", "-conf Caddyfile", "-agree", "-email $CADDY_EMAIL");
+                    .command("caddy", "-conf", "Caddyfile", "-agree", "-email", "$CADDY_EMAIL");
             Process proc = pb.start();
             new SLF4JInputStreamLogger(log, proc.getInputStream()).start();
 
