@@ -39,7 +39,7 @@ services:
     # No further action is required on your part
     - CADDY_EMAIL=
     volumes:
-    # Be default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
+    # By default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
     - ./moedata:/home/data
 ```
 
