@@ -14,6 +14,9 @@ services:
     # indicates that you agree to Let's Encrypt Subscriber Agreement.
     # No further action is required on your part
     - CADDY_EMAIL=
+    # Also super important. The domain must be specified, otherwise fred.moe will only be readable on port 2500.
+    # Example: example.org
+    - DOMAIN=
     volumes:
     # By default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
     - ./moedata:/home/data
@@ -30,6 +33,9 @@ services:
       # indicates that you agree to Let's Encrypt Subscriber Agreement.
       # No further action is required on your part
       - CADDY_EMAIL=""
+      # Also super important. The domain must be specified, otherwise fred.moe will only be readable on port 2500.
+      # Example: example.org
+      - DOMAIN=
       volumes:
       # By default your data will be mounted to ./moedata . Feel free to change this value, but keep the `:/home/data` part.
       - ./moedata:/home/data
