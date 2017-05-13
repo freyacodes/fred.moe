@@ -1,4 +1,5 @@
 {%DOMAIN%}
 proxy / localhost:2500 {
+    tis {%CADDY_EMAIL%}
     transparent
 }
