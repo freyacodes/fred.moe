@@ -2,6 +2,7 @@ var pendingFiles = [];
 var curUploadDiv;
 var uploadSize;
 
+// Fired when the user drops files for us to upload
 function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -10,6 +11,7 @@ function handleFileSelect(evt) {
 
     var fl = files.length;
 
+    // Push into array for async processing
     for (var i = 0; i < fl; i++) {
         pendingFiles.push(files[i]);
     }
@@ -22,10 +24,11 @@ function handleFileSelect(evt) {
 function handleDragOver(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+    evt.dataTransfer.dropEffect = 'copy';
 }
 
 function uploadNext() {
+    // Break the loop if we are out of files to upload
     if(pendingFiles.length === 0)
         return;
 
@@ -41,6 +44,7 @@ function uploadNext() {
     xhr.open("POST", window.location.origin + "/upload", true);
     xhr.onreadystatechange = function () {
         if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+            // Notify the user that the upload is finished, and that we have a file URL.
             console.log(xhr.responseText);
             updateProgress(uploadSize, uploadSize);
             var url = JSON.parse(xhr.responseText).files[0].url;
@@ -70,11 +74,12 @@ function uploadNext() {
 
     updateProgress(0, uploadSize);
 
+    // This attaches the file and executes the POST request to /upload
     xhr.send(formData)
 }
 
+// Utility function to show the upload progress
 function updateProgress(loaded, total) {
-    var width = (100 * (loaded / total)) + "%";
     curUploadDiv.innerHTML = (loaded + "/" + total);
 }
 
@@ -84,9 +89,11 @@ function onload() {
     dropZone.addEventListener('dragover', handleDragOver, false);
     dropZone.addEventListener('drop', handleFileSelect, false);
 
+    // Figure out the name of the site, or otherwise just the IP
     var loc = window.location.origin.replace(/https?:\/\//, "");
     loc = loc.replace(/:\d+/, "");
 
+    // Show the current version
     document.getElementById('footer').innerHTML = loc + ' ~ v2.0 ~ <a href="https://github.com/Frederikam/fred.moe">about</a>';
 }
 
