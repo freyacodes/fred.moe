@@ -1,7 +1,7 @@
 {
   "Name": "fred.moe",
   "RequestType": "POST",
-  "RequestURL": "http://fred.moe:8080/upload",
+  "RequestURL": "http://fred.moe:2500/upload",
   "FileFormName": "file",
   "ResponseType": "Text",
   "URL": "$json:files[0].url$"

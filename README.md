@@ -32,7 +32,7 @@ services:
     ports:
     - "80:80"
     - "443:443"
-    - "8080:8080"
+    - "2500:2500"
     environment:
     # This is required for automatic HTTPS! Setting this value
     # indicates that you agree to Let's Encrypt Subscriber Agreement.

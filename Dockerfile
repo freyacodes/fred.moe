@@ -1,6 +1,6 @@
 FROM azul/zulu-openjdk:8
 
-EXPOSE 80 443 8080
+EXPOSE 80 443 2500
 
 COPY application.properties /home/application.properties
 COPY target/fred.moe.jar /home/fred.moe.jar
