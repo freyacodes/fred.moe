@@ -52,7 +52,7 @@ Remember to change the `CADDY_EMAIL` setting.
 To download and run the latest container, all you need to do is run one command:
 
 ```
-docker-compose up moe -d
+docker-compose up -d moe
 ```
 
 If you want to peek inside the container, you can run this command:
