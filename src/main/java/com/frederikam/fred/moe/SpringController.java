@@ -123,7 +123,7 @@ public class SpringController {
         JSONObject arrayInner = new JSONObject();
         arrayInner.put("hash", hash);
         arrayInner.put("name", filename);
-        arrayInner.put("url", request.getScheme() + "://" + request.getServerName() + "/" + storeName);
+        arrayInner.put("url", "https://" + request.getServerName() + "/" + storeName);
         arrayInner.put("size", f.length());
 
         files.put(arrayInner);
