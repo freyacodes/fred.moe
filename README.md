@@ -81,3 +81,21 @@ Pull requests are welcome. Please follow the code style used here.
 
 ## Feature requests
 Open a GitHub issue and I'll get to you soon, or just contact me directly. 
+
+## ShareX example configuration
+You can copy and import the below configuration into ShareX. Be sure to replace fred.moe with your own instance's domain.
+
+![Obligatory alt text](https://fred.moe/39J.png)
+
+```json
+{
+  "Name": "fred.moe",
+  "DestinationType": "None",
+  "RequestType": "POST",
+  "RequestURL": "https://fred.moe/upload",
+  "FileFormName": "file",
+  "ResponseType": "Text",
+  "URL": "$json:files[0].url$"
+}
+```
+
