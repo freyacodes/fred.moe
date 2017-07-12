@@ -86,3 +86,15 @@ a {
 .version {
     display: inline;
 }
+
+/* error pages */
+
+body {
+    background: #F5F5F5 url(img/concrete_seamless.png);
+}
+
+.title {
+    font-family: 'Roboto', sans-serif;
+    margin-top: 5vh;
+    font-size: 64px;
+}
