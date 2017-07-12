@@ -2,6 +2,7 @@ package com.frederikam.fred.moe;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.io.FileUtils;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.IOUtils;
@@ -13,11 +14,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -140,17 +144,31 @@ public class SpringController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleError(HttpServletRequest req, Exception ex) {
+    public void handleError(HttpServletRequest req, HttpServletResponse res, Exception ex) {
         log.error("Request raised an error: " + req.getRequestURL(), ex);
+        sendErrorPage(res, 500);
+    }
 
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("exception", ex);
-        mav.addObject("url", req.getRequestURL());
-        mav.setViewName("error");
+    @ExceptionHandler(FileNotFoundException.class)
+    public void handleError(HttpServletRequest req, HttpServletResponse res, FileNotFoundException ex) {
+        log.error("404 not found: " + req.getServletPath());
+        sendErrorPage(res, 404);
+    }
 
-        mav.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+    private void sendErrorPage(HttpServletResponse res, int status) {
+        if (res.isCommitted()) {
+            log.warn("Cannot send error page because response is already committed!");
+            return;
+        }
 
-        return mav;
+        res.reset();
+        res.setStatus(status);
+        res.setContentType("text/html");
+        try {
+            res.getWriter().append(FileUtils.readFileToString(new File("public/" + status + ".html")));
+        } catch (IOException e) {
+            log.error("Exception while sending error page", e);
+        }
     }
 
 }
