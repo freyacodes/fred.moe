@@ -79,6 +79,7 @@ public class SpringController {
                 TikaInputStream.get(f.toPath()), metadata);
 
         response.setContentType(mediaType.toString());
+        response.setContentLengthLong(f.length());
 
         IOUtils.copy(new FileInputStream(f), response.getOutputStream());
         response.flushBuffer();
