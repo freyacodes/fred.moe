@@ -5,6 +5,7 @@ services:
     image: frederikam/fred.moe:latest
     hostname: moe
     container_name: moe
+    restart: always
     ports:
     - "80:80"
     - "443:443"
