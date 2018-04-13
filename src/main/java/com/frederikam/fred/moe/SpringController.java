@@ -81,7 +81,10 @@ public class SpringController {
         response.setContentType(mediaType.toString());
         response.setContentLengthLong(f.length());
 
-        IOUtils.copy(new FileInputStream(f), response.getOutputStream());
+        try (FileInputStream fis = new FileInputStream(f)) {
+            IOUtils.copy(fis, response.getOutputStream());
+        }
+
         response.flushBuffer();
     }
 
@@ -91,7 +94,7 @@ public class SpringController {
                          HttpServletResponse response,
                          @RequestHeader(required = false) String name,
                          @RequestParam("file") MultipartFile file
-    ) throws IOException, FileUploadException {
+    ) throws IOException {
         log.info("POST "+request.getServletPath());
 
         String filename = file.getOriginalFilename();
@@ -116,7 +119,10 @@ public class SpringController {
         //noinspection ResultOfMethodCallIgnored
         file.transferTo(f);
 
-        String hash = Base64.getEncoder().encodeToString(DigestUtils.md5(new FileInputStream(f)));
+        String hash;
+        try(FileInputStream fis = new FileInputStream(f)) {
+            hash = Base64.getEncoder().encodeToString(DigestUtils.md5(fis));
+        }
 
         log.info("Hash: " + hash);
 
