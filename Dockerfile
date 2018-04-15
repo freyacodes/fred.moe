@@ -13,6 +13,6 @@ RUN apt update && \
     apt install clamav -y && \
     apt install curl -y && \
     apt clean && \
-    curl https://getcaddy.com | bash
+    curl https://getcaddy.com | bash -s personal
 
 CMD cd /home && sh ./run.sh
