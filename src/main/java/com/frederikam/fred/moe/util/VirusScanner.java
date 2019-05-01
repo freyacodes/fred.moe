@@ -30,7 +30,6 @@ public class VirusScanner extends Thread {
     public void run() {
         new CronVirusScanner().start();
 
-        //noinspection InfiniteLoopStatement
         while (true) {
             try {
                 handleFile(queue.take());
