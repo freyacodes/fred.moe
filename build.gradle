@@ -58,7 +58,7 @@ tasks.withType(JavaCompile) {
 }
 
 // Define the main class for the application
-mainClassName = 'com.frederikam.fred.moe.FredDotMoe'
+mainClassName = 'fred.moe.FredDotMoe'
 
 compileKotlin {
     kotlinOptions {

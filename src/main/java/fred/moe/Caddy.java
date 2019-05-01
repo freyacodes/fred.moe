@@ -1,4 +1,4 @@
-package com.frederikam.fred.moe;
+package fred.moe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

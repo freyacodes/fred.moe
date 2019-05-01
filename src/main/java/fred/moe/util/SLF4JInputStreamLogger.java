@@ -23,7 +23,7 @@
  *
  */
 
-package com.frederikam.fred.moe.util;
+package fred.moe.util;
 
 import org.slf4j.Logger;
 

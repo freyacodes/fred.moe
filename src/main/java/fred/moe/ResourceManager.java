@@ -1,4 +1,4 @@
-package com.frederikam.fred.moe;
+package fred.moe;
 
 import java.io.File;
 import java.net.URISyntaxException;

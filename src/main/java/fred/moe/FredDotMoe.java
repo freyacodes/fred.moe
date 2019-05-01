@@ -1,6 +1,6 @@
-package com.frederikam.fred.moe;
+package fred.moe;
 
-import com.frederikam.fred.moe.util.VirusScanner;
+import fred.moe.util.VirusScanner;
 import org.apache.tika.exception.TikaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

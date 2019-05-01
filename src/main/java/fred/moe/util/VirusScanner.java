@@ -1,6 +1,6 @@
-package com.frederikam.fred.moe.util;
+package fred.moe.util;
 
-import com.frederikam.fred.moe.ResourceManager;
+import fred.moe.ResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

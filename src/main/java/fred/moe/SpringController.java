@@ -1,7 +1,6 @@
-package com.frederikam.fred.moe;
+package fred.moe;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.FileUtils;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.exception.TikaException;

@@ -1,4 +1,4 @@
-package com.frederikam.fred.moe.exception;
+package fred.moe.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
